@@ -30,6 +30,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/orders" element={<OrderHistory />} />
+
             </Routes>
           </main>
         </div>
