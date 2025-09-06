@@ -116,7 +116,7 @@ const App = () => {
             />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
               {/* Sort */}
-              <select id="sort" value={sortBy} onChange={handleSortChange} className="...">
+              <select id="sort" value={sortBy} onChange={handleSortChange} className="w-full px-4 py-3 bg-white/20 text-white border-none rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none text-center">
                 <option value="" className="text-black">Sort By (Newest)</option>
                 <option value="price_asc" className="text-black">Price: Low to High</option>
                 <option value="price_desc" className="text-black">Price: High to Low</option>
@@ -124,14 +124,14 @@ const App = () => {
                 <option value="oldest" className="text-black">Oldest</option>
               </select>
               {/* Filter (Category) */}
-              <select id="category" value={selectedCategory} onChange={handleCategoryChange} className="...">
+              <select id="category" value={selectedCategory} onChange={handleCategoryChange} className="w-full px-4 py-3 bg-white/20 text-white border-none rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none text-center">
                 <option value="" className="text-black">All Categories</option>
                 {categories.map(category => (
                   <option key={category.id} value={category.id} className="text-black">{category.name}</option>
                 ))}
               </select>
               {/* Group By */}
-              <select id="groupBy" value={groupBy} onChange={handleGroupByChange} className="...">
+              <select id="groupBy" value={groupBy} onChange={handleGroupByChange} className="w-full px-4 py-3 bg-white/20 text-white border-none rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none text-center">
                 <option value="" className="text-black">Don't Group</option>
                 <option value="category" className="text-black">Group by Category</option>
                 <option value="seller" className="text-black">Group by Seller</option>
@@ -146,7 +146,6 @@ const App = () => {
           <h2 className="text-3xl font-bold text-gray-800">
             {getCategoryName(selectedCategory)}
           </h2>
-          {/* --- CHANGE 3: Removed the redundant category dropdown from the main section --- */}
         </div>
 
         {/* --- CHANGE 4: Updated Rendering Logic for Grouping --- */}
