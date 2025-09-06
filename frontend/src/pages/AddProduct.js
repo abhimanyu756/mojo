@@ -25,35 +25,13 @@ const AddProduct = () => {
     image: null,
   });
 
-  const apiCategory = {
-    get: async (url) => {
-      console.log("API call to:", url);
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock categories response - replace with your actual API structure
-      if (url === "/api/products/categories/") {
-        return {
-          data: [
-            { id: 1, name: "Electronics" },
-            { id: 2, name: "Furniture" },
-            { id: 3, name: "Clothing" },
-            { id: 4, name: "Books" },
-            { id: 5, name: "Sports & Outdoors" },
-          ],
-        };
-      }
-      throw new Error("API endpoint not found");
-    },
-  };
-
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState(null);
 
   // Cleanup preview URL on component unmount
@@ -76,7 +54,7 @@ const AddProduct = () => {
 
     try {
       console.log("Fetching categories...");
-      const response = await apiCategory.get("/api/products/categories/");
+      const response = await api.get("/api/products/categories/");
       console.log("Categories response:", response.data);
 
       setCategories(response.data);
@@ -89,12 +67,12 @@ const AddProduct = () => {
       setCategoriesError("Failed to load categories. Please refresh the page.");
 
       // Fallback categories for testing
-      setCategories([
-        { id: "electronics", name: "Electronics" },
-        { id: "furniture", name: "Furniture" },
-        { id: "clothing", name: "Clothing" },
-        { id: "books", name: "Books" },
-      ]);
+      // setCategories([
+      //   { id: "electronics", name: "Electronics" },
+      //   { id: "furniture", name: "Furniture" },
+      //   { id: "clothing", name: "Clothing" },
+      //   { id: "books", name: "Books" },
+      // ]);
     } finally {
       setCategoriesLoading(false);
     }
@@ -134,7 +112,7 @@ const AddProduct = () => {
       // Add all form fields to FormData
       Object.keys(formData).forEach((key) => {
         if (key === "image" && formData[key]) {
-          submitData.append("image", formData[key]);
+          submitData.append("uploaded_images", formData[key]);
         } else if (
           key !== "image" &&
           formData[key] !== "" &&
@@ -296,12 +274,20 @@ const AddProduct = () => {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                     required
                   >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
+                    {categoriesLoading ? (
+                      <option>Loading categories...</option>
+                    ) : categoriesError ? (
+                      <option>{categoriesError}</option>
+                    ) : (
+                      <>
+                        <option value="">Select a category</option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </>
+                    )}
                   </select>
                   {errors.category && (
                     <p className="mt-1 text-sm text-red-600">
