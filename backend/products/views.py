@@ -28,6 +28,24 @@ class ProductDetailView(generics.RetrieveAPIView):
 class ProductCreateView(generics.CreateAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+    
+    def create(self, request, *args, **kwargs):
+        # Handle file uploads
+        data = request.data.copy()
+        
+        # Handle single image upload
+        if 'image' in request.FILES:
+            data['uploaded_images'] = [request.FILES['image']]
+        
+        # Handle multiple images if needed
+        elif 'images' in request.FILES:
+            data['uploaded_images'] = request.FILES.getlist('images')
+        
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class UserProductsView(generics.ListAPIView):
     serializer_class = ProductListSerializer
