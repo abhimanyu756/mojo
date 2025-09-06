@@ -16,8 +16,8 @@ const Register = () => {
     username: '',
     password: '',
     password_confirm: '',
-    first_name: '',
-    last_name: ''
+    // first_name: '',
+    // last_name: ''
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -75,7 +75,7 @@ const Register = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
                 <input id="first_name" name="first_name" type="text" value={formData.first_name} onChange={handleChange} className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" />
@@ -84,7 +84,7 @@ const Register = () => {
                 <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">Last Name</label>
                 <input id="last_name" name="last_name" type="text" value={formData.last_name} onChange={handleChange} className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" />
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
