@@ -16,9 +16,25 @@ class ProductListView(generics.ListAPIView):
     queryset = Product.objects.filter(is_available=True)
     serializer_class = ProductListSerializer
     permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    
+    # --- MODIFICATIONS START ---
+    filter_backends = [
+        DjangoFilterBackend, 
+        filters.SearchFilter, 
+        filters.OrderingFilter  # Add OrderingFilter
+    ]
+    
+    # Fields for filtering (e.g., ?category=1)
     filterset_fields = ['category', 'condition']
-    search_fields = ['title', 'description']
+    
+    # Fields for searching (e.g., ?search=bottle)
+    search_fields = ['title', 'description', 'seller__username']
+
+    # Fields for sorting (e.g., ?ordering=price or ?ordering=-created_at)
+    ordering_fields = ['price', 'created_at']
+    
+    # Default sorting order if none is specified
+    ordering = ['-created_at'] 
 
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.filter(is_available=True)
