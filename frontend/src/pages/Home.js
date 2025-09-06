@@ -7,17 +7,17 @@ const mockApi = {
   get: (path) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        if (path.includes('/api/products/categories/')) {
+        if (path.includes("/api/products/categories/")) {
           resolve({
             data: [
-              { id: 'electronics', name: 'Electronics' },
-              { id: 'furniture', name: 'Furniture' },
-              { id: 'clothing', name: 'Clothing' },
-              { id: 'books', name: 'Books' },
+              { id: "electronics", name: "Electronics" },
+              { id: "furniture", name: "Furniture" },
+              { id: "clothing", name: "Clothing" },
+              { id: "books", name: "Books" },
             ],
           });
         }
-        if (path.includes('/api/products/')) {
+        if (path.includes("/api/products/")) {
           const allProducts = [
             {
               id: 1,
@@ -117,11 +117,11 @@ const mockApi = {
             },
           ];
 
-          const params = new URLSearchParams(path.split('?')[1]);
-          const search = params.get('search')?.toLowerCase() || '';
-          const category = params.get('category') || '';
-          const sort = params.get('sort') || '';
-          const group = params.get('group') || '';
+          const params = new URLSearchParams(path.split("?")[1]);
+          const search = params.get("search")?.toLowerCase() || "";
+          const category = params.get("category") || "";
+          const sort = params.get("sort") || "";
+          const group = params.get("group") || "";
 
           let filteredProducts = allProducts.filter(p => {
             const matchesSearch = search ?
@@ -133,27 +133,31 @@ const mockApi = {
           });
 
           // Sort functionality
-          if (sort === 'price_asc') {
-            filteredProducts = filteredProducts.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-          } else if (sort === 'price_desc') {
-            filteredProducts = filteredProducts.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-          } else if (sort === 'newest') {
+          if (sort === "price_asc") {
+            filteredProducts = filteredProducts.sort(
+              (a, b) => parseFloat(a.price) - parseFloat(b.price)
+            );
+          } else if (sort === "price_desc") {
+            filteredProducts = filteredProducts.sort(
+              (a, b) => parseFloat(b.price) - parseFloat(a.price)
+            );
+          } else if (sort === "newest") {
             filteredProducts = filteredProducts.sort((a, b) => b.id - a.id);
-          } else if (sort === 'oldest') {
+          } else if (sort === "oldest") {
             filteredProducts = filteredProducts.sort((a, b) => a.id - b.id);
           }
 
           // Group By functionality (returns grouped array of arrays)
-          if (group === 'category') {
+          if (group === "category") {
             const grouped = {};
-            filteredProducts.forEach(p => {
+            filteredProducts.forEach((p) => {
               if (!grouped[p.category]) grouped[p.category] = [];
               grouped[p.category].push(p);
             });
             filteredProducts = Object.values(grouped).flat();
-          } else if (group === 'seller') {
+          } else if (group === "seller") {
             const grouped = {};
-            filteredProducts.forEach(p => {
+            filteredProducts.forEach((p) => {
               if (!grouped[p.seller]) grouped[p.seller] = [];
               grouped[p.seller].push(p);
             });
@@ -172,29 +176,34 @@ const App = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('');
-  const [groupBy, setGroupBy] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [groupBy, setGroupBy] = useState("");
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, []);
 
-  const fetchProducts = async (search = '', category = '', sort = '', group = '') => {
+  const fetchProducts = async (
+    search = "",
+    category = "",
+    sort = "",
+    group = ""
+  ) => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (category) params.append('category', category);
-      if (sort) params.append('sort', sort);
-      if (group) params.append('group', group);
+      if (search) params.append("search", search);
+      if (category) params.append("category", category);
+      if (sort) params.append("sort", sort);
+      if (group) params.append("group", group);
 
       const response = await mockApi.get(`/api/products/?${params}`);
       setProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
@@ -202,10 +211,10 @@ const App = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await mockApi.get('/api/products/categories/');
+      const response = await mockApi.get("/api/products/categories/");
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -239,10 +248,10 @@ const App = () => {
   };
 
   const getCategoryName = (categoryId) => {
-    if (!categoryId) return 'Latest Products';
-    const category = categories.find(c => c.id === categoryId);
-    return category ? `${category.name} Products` : 'Filtered Products';
-  }
+    if (!categoryId) return "Latest Products";
+    const category = categories.find((c) => c.id === categoryId);
+    return category ? `${category.name} Products` : "Filtered Products";
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -253,7 +262,8 @@ const App = () => {
             Find Your Next Treasure
           </h1>
           <p className="text-lg md:text-xl text-green-100 max-w-2xl mx-auto mb-8">
-            Discover unique second-hand items and give them a new life. Quality finds at unbeatable prices.
+            Discover unique second-hand items and give them a new life. Quality
+            finds at unbeatable prices.
           </p>
           <div className="max-w-xl mx-auto">
             <ResponsiveSearchBar
@@ -310,14 +320,20 @@ const App = () => {
               className="appearance-none w-56 bg-white border border-gray-300 rounded-lg py-3 px-4 pr-8 leading-tight focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500"
             >
               <option value="">All Categories</option>
-              {categories.map(category => (
+              {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+              <svg
+                className="fill-current h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
             </div>
           </div>
         </div>
@@ -331,14 +347,16 @@ const App = () => {
           <div>
             {products.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {products.map(product => (
+                {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
               <div className="text-center py-20 bg-white rounded-lg shadow">
                 <p className="text-xl text-gray-600">No products found.</p>
-                <p className="text-gray-500 mt-2">Try adjusting your search or category filters.</p>
+                <p className="text-gray-500 mt-2">
+                  Try adjusting your search or category filters.
+                </p>
               </div>
             )}
           </div>

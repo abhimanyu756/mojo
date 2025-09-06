@@ -1,35 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    category: '',
-    description: '',
-    price: '',
-    quantity: '',
-    condition: '',
-    yearOfManufacture: '',
-    brand: '',
-    model: '',
-    length: '',
-    width: '',
-    height: '',
-    weight: '',
-    material: '',
-    color: '',
+    title: "",
+    category: "",
+    description: "",
+    price: "",
+    quantity: "",
+    condition: "",
+    yearOfManufacture: "",
+    brand: "",
+    model: "",
+    length: "",
+    width: "",
+    height: "",
+    weight: "",
+    material: "",
+    color: "",
     originalPackaging: false,
     manualIncluded: false,
-    workingConditionDescription: '',
-    image: null
+    workingConditionDescription: "",
+    image: null,
   });
+
+  const apiCategory = {
+    get: async (url) => {
+      console.log("API call to:", url);
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Mock categories response - replace with your actual API structure
+      if (url === "/api/products/categories/") {
+        return {
+          data: [
+            { id: 1, name: "Electronics" },
+            { id: 2, name: "Furniture" },
+            { id: 3, name: "Clothing" },
+            { id: 4, name: "Books" },
+            { id: 5, name: "Sports & Outdoors" },
+          ],
+        };
+      }
+      throw new Error("API endpoint not found");
+    },
+  };
 
   const [imagePreview, setImagePreview] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoriesError, setCategoriesError] = useState(null);
 
   // Cleanup preview URL on component unmount
   useEffect(() => {
@@ -46,19 +71,40 @@ const AddProduct = () => {
   }, []);
 
   const fetchCategories = async () => {
+    setCategoriesLoading(true);
+    setCategoriesError(null);
+
     try {
-      const response = await api.get('/api/products/categories/');
+      console.log("Fetching categories...");
+      const response = await apiCategory.get("/api/products/categories/");
+      console.log("Categories response:", response.data);
+
       setCategories(response.data);
+
+      if (!response.data || response.data.length === 0) {
+        setCategoriesError("No categories available");
+      }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
+      setCategoriesError("Failed to load categories. Please refresh the page.");
+
+      // Fallback categories for testing
+      setCategories([
+        { id: "electronics", name: "Electronics" },
+        { id: "furniture", name: "Furniture" },
+        { id: "clothing", name: "Clothing" },
+        { id: "books", name: "Books" },
+      ]);
+    } finally {
+      setCategoriesLoading(false);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -69,9 +115,9 @@ const AddProduct = () => {
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        image: file
+        image: file,
       }));
     }
   };
@@ -84,14 +130,18 @@ const AddProduct = () => {
     try {
       // Create FormData for file upload
       const submitData = new FormData();
-      
+
       // Add all form fields to FormData
-      Object.keys(formData).forEach(key => {
-        if (key === 'image' && formData[key]) {
-          submitData.append('image', formData[key]);
-        } else if (key !== 'image' && formData[key] !== '' && formData[key] !== null) {
+      Object.keys(formData).forEach((key) => {
+        if (key === "image" && formData[key]) {
+          submitData.append("image", formData[key]);
+        } else if (
+          key !== "image" &&
+          formData[key] !== "" &&
+          formData[key] !== null
+        ) {
           // Convert boolean values to strings for FormData
-          if (typeof formData[key] === 'boolean') {
+          if (typeof formData[key] === "boolean") {
             submitData.append(key, formData[key].toString());
           } else {
             submitData.append(key, formData[key]);
@@ -100,29 +150,32 @@ const AddProduct = () => {
       });
 
       // Set authentication header
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
+      const headers = {
+        "Content-Type": "multipart/form-data",
+      };
       if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
 
       // Submit to API
-      const response = await api.post('/api/products/create/', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await api.post("/api/products/create/", submitData, {
+        headers: headers,
       });
 
       // Success - redirect to product detail or products list
-      console.log('Product created successfully:', response.data);
+      console.log("Product created successfully:", response.data);
       navigate(`/product/${response.data.id}`);
-      
     } catch (error) {
-      console.error('Error creating product:', error);
-      
+      console.error("Error creating product:", error);
+
       if (error.response?.data) {
         setErrors(error.response.data);
       } else {
-        setErrors({ general: 'An error occurred while creating the product. Please try again.' });
+        setErrors({
+          general:
+            "An error occurred while creating the product. Please try again.",
+        });
       }
     } finally {
       setLoading(false);
@@ -133,17 +186,25 @@ const AddProduct = () => {
     <div className="max-w-6xl mx-auto px-5">
       <div className="max-w-2xl mx-auto py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-gray-800 mb-2">Add a new Product</h1>
-          <p className="text-gray-600">Share your item with the EcoFinds community</p>
+          <h1 className="text-3xl font-semibold text-gray-800 mb-2">
+            Add a new Product
+          </h1>
+          <p className="text-gray-600">
+            Share your item with the EcoFinds community
+          </p>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <form onSubmit={handleSubmit} className="p-8">
             <div className="mb-8 pb-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-5">Product Images</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">
+                Product Images
+              </h3>
 
               <div className="mb-4">
-                <label className="block mb-2 text-sm font-semibold text-gray-800">Product Images</label>
+                <label className="block mb-2 text-sm font-semibold text-gray-800">
+                  Product Images
+                </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:border-green-500 hover:bg-green-50 transition-colors duration-300 cursor-pointer">
                   <input
                     type="file"
@@ -152,7 +213,10 @@ const AddProduct = () => {
                     className="hidden"
                     id="image-upload"
                   />
-                  <label htmlFor="image-upload" className="cursor-pointer block w-full">
+                  <label
+                    htmlFor="image-upload"
+                    className="cursor-pointer block w-full"
+                  >
                     {imagePreview ? (
                       <div className="relative w-full h-48 overflow-hidden rounded-lg">
                         <img
@@ -162,7 +226,9 @@ const AddProduct = () => {
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 text-white">
                           <div className="text-2xl mb-2">📷</div>
-                          <p className="text-sm font-medium mb-1">Click to change image</p>
+                          <p className="text-sm font-medium mb-1">
+                            Click to change image
+                          </p>
                           <div className="text-xs opacity-80">
                             <small>{formData.image?.name}</small>
                           </div>
@@ -171,10 +237,14 @@ const AddProduct = () => {
                     ) : (
                       <div className="py-8">
                         <div className="text-4xl mb-4">📷</div>
-                        <h4 className="text-lg font-medium text-gray-800 mb-2">Add product</h4>
+                        <h4 className="text-lg font-medium text-gray-800 mb-2">
+                          Add product
+                        </h4>
                         <p className="text-gray-600 mb-4">Image</p>
                         <div className="text-gray-500 text-xs">
-                          <small>Tips: Use good lighting and show multiple angles</small>
+                          <small>
+                            Tips: Use good lighting and show multiple angles
+                          </small>
                         </div>
                       </div>
                     )}
@@ -184,10 +254,17 @@ const AddProduct = () => {
             </div>
 
             <div className="mb-8 pb-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-5">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">
+                Basic Information
+              </h3>
 
               <div className="mb-4">
-                <label htmlFor="title" className="block mb-2 text-sm font-semibold text-gray-800">Product Title</label>
+                <label
+                  htmlFor="title"
+                  className="block mb-2 text-sm font-semibold text-gray-800"
+                >
+                  Product Title
+                </label>
                 <input
                   type="text"
                   id="title"
@@ -205,7 +282,12 @@ const AddProduct = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label htmlFor="category" className="block mb-2 text-sm font-semibold text-gray-800">Product Category</label>
+                  <label
+                    htmlFor="category"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Product Category
+                  </label>
                   <select
                     id="category"
                     name="category"
@@ -215,19 +297,26 @@ const AddProduct = () => {
                     required
                   >
                     <option value="">Select a category</option>
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
                     ))}
                   </select>
                   {errors.category && (
-                    <p className="mt-1 text-sm text-red-600">{errors.category[0]}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.category[0]}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="condition" className="block mb-2 text-sm font-semibold text-gray-800">Condition</label>
+                  <label
+                    htmlFor="condition"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Condition
+                  </label>
                   <select
                     id="condition"
                     name="condition"
@@ -248,7 +337,12 @@ const AddProduct = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="price" className="block mb-2 text-sm font-semibold text-gray-800">Price ($)</label>
+                  <label
+                    htmlFor="price"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Price ($)
+                  </label>
                   <input
                     type="number"
                     id="price"
@@ -264,7 +358,12 @@ const AddProduct = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="quantity" className="block mb-2 text-sm font-semibold text-gray-800">Quantity</label>
+                  <label
+                    htmlFor="quantity"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Quantity
+                  </label>
                   <input
                     type="number"
                     id="quantity"
@@ -281,10 +380,17 @@ const AddProduct = () => {
             </div>
 
             <div className="mb-8 pb-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-5">Product Details</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">
+                Product Details
+              </h3>
 
               <div className="mb-4">
-                <label htmlFor="description" className="block mb-2 text-sm font-semibold text-gray-800">Product Description</label>
+                <label
+                  htmlFor="description"
+                  className="block mb-2 text-sm font-semibold text-gray-800"
+                >
+                  Product Description
+                </label>
                 <textarea
                   id="description"
                   name="description"
@@ -299,7 +405,12 @@ const AddProduct = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label htmlFor="brand" className="block mb-2 text-sm font-semibold text-gray-800">Brand</label>
+                  <label
+                    htmlFor="brand"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Brand
+                  </label>
                   <input
                     type="text"
                     id="brand"
@@ -312,7 +423,12 @@ const AddProduct = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="model" className="block mb-2 text-sm font-semibold text-gray-800">Model</label>
+                  <label
+                    htmlFor="model"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Model
+                  </label>
                   <input
                     type="text"
                     id="model"
@@ -326,7 +442,12 @@ const AddProduct = () => {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="yearOfManufacture" className="block mb-2 text-sm font-semibold text-gray-800">Year of Manufacture (if applicable)</label>
+                <label
+                  htmlFor="yearOfManufacture"
+                  className="block mb-2 text-sm font-semibold text-gray-800"
+                >
+                  Year of Manufacture (if applicable)
+                </label>
                 <input
                   type="number"
                   id="yearOfManufacture"
@@ -342,7 +463,12 @@ const AddProduct = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="material" className="block mb-2 text-sm font-semibold text-gray-800">Material</label>
+                  <label
+                    htmlFor="material"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Material
+                  </label>
                   <input
                     type="text"
                     id="material"
@@ -355,7 +481,12 @@ const AddProduct = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="color" className="block mb-2 text-sm font-semibold text-gray-800">Color</label>
+                  <label
+                    htmlFor="color"
+                    className="block mb-2 text-sm font-semibold text-gray-800"
+                  >
+                    Color
+                  </label>
                   <input
                     type="text"
                     id="color"
@@ -370,10 +501,14 @@ const AddProduct = () => {
             </div>
 
             <div className="mb-8 pb-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-5">Dimensions & Weight</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">
+                Dimensions & Weight
+              </h3>
 
               <div className="mb-4">
-                <label className="block mb-2 text-sm font-semibold text-gray-800">Dimensions (Length, Width, Height)</label>
+                <label className="block mb-2 text-sm font-semibold text-gray-800">
+                  Dimensions (Length, Width, Height)
+                </label>
                 <div className="grid grid-cols-3 gap-4">
                   <input
                     type="number"
@@ -409,7 +544,12 @@ const AddProduct = () => {
               </div>
 
               <div>
-                <label htmlFor="weight" className="block mb-2 text-sm font-semibold text-gray-800">Weight (kg)</label>
+                <label
+                  htmlFor="weight"
+                  className="block mb-2 text-sm font-semibold text-gray-800"
+                >
+                  Weight (kg)
+                </label>
                 <input
                   type="number"
                   id="weight"
@@ -425,7 +565,9 @@ const AddProduct = () => {
             </div>
 
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-5">Additional Information</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">
+                Additional Information
+              </h3>
 
               <div className="mb-4">
                 <div className="flex items-start gap-2 mb-3">
@@ -437,7 +579,10 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                     className="mt-1 w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                   />
-                  <label htmlFor="originalPackaging" className="text-sm font-normal text-gray-700 cursor-pointer leading-5">
+                  <label
+                    htmlFor="originalPackaging"
+                    className="text-sm font-normal text-gray-700 cursor-pointer leading-5"
+                  >
                     Original Packaging (Checkbox - implies a boolean field)
                   </label>
                 </div>
@@ -451,14 +596,23 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                     className="mt-1 w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                   />
-                  <label htmlFor="manualIncluded" className="text-sm font-normal text-gray-700 cursor-pointer leading-5">
-                    Manual/Instructions Included (Checkbox - implies a boolean field)
+                  <label
+                    htmlFor="manualIncluded"
+                    className="text-sm font-normal text-gray-700 cursor-pointer leading-5"
+                  >
+                    Manual/Instructions Included (Checkbox - implies a boolean
+                    field)
                   </label>
                 </div>
               </div>
 
               <div>
-                <label htmlFor="workingConditionDescription" className="block mb-2 text-sm font-semibold text-gray-800">Working Condition Description</label>
+                <label
+                  htmlFor="workingConditionDescription"
+                  className="block mb-2 text-sm font-semibold text-gray-800"
+                >
+                  Working Condition Description
+                </label>
                 <textarea
                   id="workingConditionDescription"
                   name="workingConditionDescription"
@@ -477,14 +631,14 @@ const AddProduct = () => {
                   {errors.general}
                 </div>
               )}
-              
+
               <button
                 type="submit"
                 disabled={loading}
                 className={`w-full font-semibold py-4 px-6 rounded-lg text-base shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
                   loading
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-xl transform hover:-translate-y-0.5'
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-xl transform hover:-translate-y-0.5"
                 }`}
               >
                 {loading ? (
@@ -493,7 +647,7 @@ const AddProduct = () => {
                     Creating Product...
                   </div>
                 ) : (
-                  'Add Item'
+                  "Add Item"
                 )}
               </button>
             </div>
