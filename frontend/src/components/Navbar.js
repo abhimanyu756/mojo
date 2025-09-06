@@ -32,7 +32,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex md:items-center md:space-x-2 lg:space-x-4">
-            <Link to="/" className={navLinkClasses}>Browse</Link>
+            {/* <Link to="/" className={navLinkClasses}>Browse</Link> */}
             {user ? (
               <>
                 <Link to="/add-product" className={navLinkClasses}>Sell Item</Link>
@@ -74,7 +74,7 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link to="/" className={mobileNavLinkClasses} onClick={() => setIsMenuOpen(false)}>Browse</Link>
+            {/* <Link to="/" className={mobileNavLinkClasses} onClick={() => setIsMenuOpen(false)}>Browse</Link> */}
             {user ? (
               <>
                 <Link to="/add-product" className={mobileNavLinkClasses} onClick={() => setIsMenuOpen(false)}>Sell Item</Link>
