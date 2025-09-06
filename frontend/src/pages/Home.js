@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 // --- Mock API Service ---
-// In a real application, this would be in a separate file (e.g., services/api.js)
-// We're mocking it here to make the component standalone and runnable.
 const mockApi = {
   get: (path) => {
     return new Promise((resolve) => {
@@ -32,12 +30,42 @@ const mockApi = {
           const params = new URLSearchParams(path.split('?')[1]);
           const search = params.get('search')?.toLowerCase() || '';
           const category = params.get('category') || '';
+          const sort = params.get('sort') || '';
+          const group = params.get('group') || '';
 
-          const filteredProducts = allProducts.filter(p => {
+          let filteredProducts = allProducts.filter(p => {
             const matchesSearch = p.name.toLowerCase().includes(search);
             const matchesCategory = category ? p.category === category : true;
             return matchesSearch && matchesCategory;
           });
+
+          // Sort functionality
+          if (sort === 'price_asc') {
+            filteredProducts = filteredProducts.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+          } else if (sort === 'price_desc') {
+            filteredProducts = filteredProducts.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+          } else if (sort === 'newest') {
+            filteredProducts = filteredProducts.sort((a, b) => b.id - a.id);
+          } else if (sort === 'oldest') {
+            filteredProducts = filteredProducts.sort((a, b) => a.id - b.id);
+          }
+
+          // Group By functionality (returns grouped array of arrays)
+          if (group === 'category') {
+            const grouped = {};
+            filteredProducts.forEach(p => {
+              if (!grouped[p.category]) grouped[p.category] = [];
+              grouped[p.category].push(p);
+            });
+            filteredProducts = Object.values(grouped).flat();
+          } else if (group === 'seller') {
+            const grouped = {};
+            filteredProducts.forEach(p => {
+              if (!grouped[p.seller]) grouped[p.seller] = [];
+              grouped[p.seller].push(p);
+            });
+            filteredProducts = Object.values(grouped).flat();
+          }
 
           resolve({ data: filteredProducts });
         }
@@ -46,9 +74,7 @@ const mockApi = {
   },
 };
 
-
 // --- ProductCard Component ---
-// In a real application, this would be in its own file (e.g., components/ProductCard.js)
 const ProductCard = ({ product }) => {
   return (
     <div className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
@@ -80,27 +106,29 @@ const ProductCard = ({ product }) => {
   );
 };
 
-
-// --- Home Page Component (Now named App for single-file structure) ---
+// --- Home Page Component ---
 const App = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [groupBy, setGroupBy] = useState('');
 
   useEffect(() => {
-    // Initial fetch for products and categories
     fetchProducts();
     fetchCategories();
   }, []);
 
-  const fetchProducts = async (search = '', category = '') => {
+  const fetchProducts = async (search = '', category = '', sort = '', group = '') => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (category) params.append('category', category);
+      if (sort) params.append('sort', sort);
+      if (group) params.append('group', group);
 
       const response = await mockApi.get(`/api/products/?${params}`);
       setProducts(response.data);
@@ -122,13 +150,25 @@ const App = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchProducts(searchTerm, selectedCategory);
+    fetchProducts(searchTerm, selectedCategory, sortBy, groupBy);
   };
 
   const handleCategoryChange = (e) => {
     const category = e.target.value;
     setSelectedCategory(category);
-    fetchProducts(searchTerm, category);
+    fetchProducts(searchTerm, category, sortBy, groupBy);
+  };
+
+  const handleSortChange = (e) => {
+    const value = e.target.value;
+    setSortBy(value);
+    fetchProducts(searchTerm, selectedCategory, value, groupBy);
+  };
+
+  const handleGroupByChange = (e) => {
+    const value = e.target.value;
+    setGroupBy(value);
+    fetchProducts(searchTerm, selectedCategory, sortBy, value);
   };
 
   const getCategoryName = (categoryId) => {
@@ -148,19 +188,69 @@ const App = () => {
           <p className="text-lg md:text-xl text-green-100 max-w-2xl mx-auto mb-8">
             Discover unique second-hand items and give them a new life. Quality finds at unbeatable prices.
           </p>
-          <div className="max-w-xl mx-auto">
+           <div className="max-w-xl mx-auto">
             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center bg-white rounded-full p-2 shadow-2xl">
               <input
                 type="text"
                 placeholder="Search for anything..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-grow w-full sm:w-auto px-6 py-3 text-gray-700 bg-transparent border-none rounded-full focus:outline-none focus:ring-0 text-center sm:text-left"
+                className="flex-grow w-full sm:w-auto px-6 py-3 text-black bg-white border-none rounded-full focus:outline-none focus:ring-0 text-center sm:text-left"
               />
               <button type="submit" className="w-full sm:w-auto mt-2 sm:mt-0 rounded-full bg-green-500 text-white px-8 py-3 font-semibold transition-transform duration-200 hover:bg-green-600 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400">
                 Search
               </button>
             </form>
+            {/* Sort, Filter, Group By Section */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full">
+              {/* Sort */}
+              <div className="flex flex-col w-full sm:w-1/3">
+                <label htmlFor="sort" className="text-sm font-medium mb-1 text-black">Sort</label>
+                <select
+                  id="sort"
+                  value={sortBy}
+                  onChange={handleSortChange}
+                  className="w-full px-6 py-3 bg-white text-black border-none rounded-full shadow-2xl focus:outline-none"
+                >
+                  <option value="">Default</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                </select>
+              </div>
+              {/* Filter (Category) */}
+              <div className="flex flex-col w-full sm:w-1/3">
+                <label htmlFor="category" className="text-sm font-medium mb-1 text-black">Filter</label>
+                <select
+                  id="category"
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                  className="w-full px-6 py-3 bg-white text-black border-none rounded-full shadow-2xl focus:outline-none"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* Group By */}
+              <div className="flex flex-col w-full sm:w-1/3">
+                <label htmlFor="groupBy" className="text-sm font-medium mb-1 text-black">Group By</label>
+                <select
+                  id="groupBy"
+                  value={groupBy}
+                  onChange={handleGroupByChange}
+                  className="w-full px-6 py-3 bg-white text-black border-none rounded-full shadow-2xl focus:outline-none"
+                >
+                  <option value="">None</option>
+                  <option value="category">Category</option>
+                  <option value="seller">Seller</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </header>
