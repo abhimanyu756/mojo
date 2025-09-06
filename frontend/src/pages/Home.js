@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import ResponsiveSearchBar from '../components/SearcBar';
+import ProductCard from '../components/ProductCard';
 
 // --- Mock API Service ---
 const mockApi = {
@@ -19,72 +21,99 @@ const mockApi = {
           const allProducts = [
             {
               id: 1,
-              name: "Vintage Leather Jacket",
-              price: "75.00",
-              category: "clothing",
-              imageUrl:
-                "https://placehold.co/600x400/5a3a2a/ffffff?text=Jacket",
-              seller: "RetroWears",
+              title: 'Vintage Leather Jacket',
+              name: 'Vintage Leather Jacket',
+              price: '75.00',
+              category: 'clothing',
+              category_name: 'Clothing',
+              primary_image: 'https://placehold.co/600x400/5a3a2a/ffffff?text=Jacket',
+              seller: 'RetroWears',
+              seller_name: 'RetroWears',
+              condition: 'good'
             },
             {
               id: 2,
-              name: "Mid-Century Modern Armchair",
-              price: "250.00",
-              category: "furniture",
-              imageUrl:
-                "https://placehold.co/600x400/c2a58c/ffffff?text=Armchair",
-              seller: "TimelessDesigns",
+              title: 'Mid-Century Modern Armchair',
+              name: 'Mid-Century Modern Armchair',
+              price: '250.00',
+              category: 'furniture',
+              category_name: 'Furniture',
+              primary_image: 'https://placehold.co/600x400/c2a58c/ffffff?text=Armchair',
+              seller: 'TimelessDesigns',
+              seller_name: 'TimelessDesigns',
+              condition: 'excellent'
             },
             {
               id: 3,
-              name: "Portable Bluetooth Speaker",
-              price: "45.00",
-              category: "electronics",
-              imageUrl:
-                "https://placehold.co/600x400/333333/ffffff?text=Speaker",
-              seller: "SoundWave",
+              title: 'Portable Bluetooth Speaker',
+              name: 'Portable Bluetooth Speaker',
+              price: '45.00',
+              category: 'electronics',
+              category_name: 'Electronics',
+              primary_image: 'https://placehold.co/600x400/333333/ffffff?text=Speaker',
+              seller: 'SoundWave',
+              seller_name: 'SoundWave',
+              condition: 'like-new'
             },
             {
               id: 4,
-              name: "Classic Sci-Fi Novel Set",
-              price: "30.00",
-              category: "books",
-              imageUrl: "https://placehold.co/600x400/4a5568/ffffff?text=Books",
-              seller: "PageTurners",
+              title: 'Classic Sci-Fi Novel Set',
+              name: 'Classic Sci-Fi Novel Set',
+              price: '30.00',
+              category: 'books',
+              category_name: 'Books',
+              primary_image: 'https://placehold.co/600x400/4a5568/ffffff?text=Books',
+              seller: 'PageTurners',
+              seller_name: 'PageTurners',
+              condition: 'good'
             },
             {
               id: 5,
-              name: "Hand-knitted Wool Scarf",
-              price: "25.00",
-              category: "clothing",
-              imageUrl: "https://placehold.co/600x400/7a527a/ffffff?text=Scarf",
-              seller: "CozyCreations",
+              title: 'Hand-knitted Wool Scarf',
+              name: 'Hand-knitted Wool Scarf',
+              price: '25.00',
+              category: 'clothing',
+              category_name: 'Clothing',
+              primary_image: 'https://placehold.co/600x400/7a527a/ffffff?text=Scarf',
+              seller: 'CozyCreations',
+              seller_name: 'CozyCreations',
+              condition: 'excellent'
             },
             {
               id: 6,
-              name: "Ergonomic Office Chair",
-              price: "120.00",
-              category: "furniture",
-              imageUrl: "https://placehold.co/600x400/2d3748/ffffff?text=Chair",
-              seller: "WorkComfort",
+              title: 'Ergonomic Office Chair',
+              name: 'Ergonomic Office Chair',
+              price: '120.00',
+              category: 'furniture',
+              category_name: 'Furniture',
+              primary_image: 'https://placehold.co/600x400/2d3748/ffffff?text=Chair',
+              seller: 'WorkComfort',
+              seller_name: 'WorkComfort',
+              condition: 'good'
             },
             {
               id: 7,
-              name: "Wireless Noise-Cancelling Headphones",
-              price: "150.00",
-              category: "electronics",
-              imageUrl:
-                "https://placehold.co/600x400/1a202c/ffffff?text=Headphones",
-              seller: "AudioPhile",
+              title: 'Wireless Noise-Cancelling Headphones',
+              name: 'Wireless Noise-Cancelling Headphones',
+              price: '150.00',
+              category: 'electronics',
+              category_name: 'Electronics',
+              primary_image: 'https://placehold.co/600x400/1a202c/ffffff?text=Headphones',
+              seller: 'AudioPhile',
+              seller_name: 'AudioPhile',
+              condition: 'like-new'
             },
             {
               id: 8,
-              name: "Hardcover Fantasy Trilogy",
-              price: "55.00",
-              category: "books",
-              imageUrl:
-                "https://placehold.co/600x400/8c6a56/ffffff?text=Trilogy",
-              seller: "EpicReads",
+              title: 'Hardcover Fantasy Trilogy',
+              name: 'Hardcover Fantasy Trilogy',
+              price: '55.00',
+              category: 'books',
+              category_name: 'Books',
+              primary_image: 'https://placehold.co/600x400/8c6a56/ffffff?text=Trilogy',
+              seller: 'EpicReads',
+              seller_name: 'EpicReads',
+              condition: 'excellent'
             },
           ];
 
@@ -94,8 +123,11 @@ const mockApi = {
           const sort = params.get("sort") || "";
           const group = params.get("group") || "";
 
-          let filteredProducts = allProducts.filter((p) => {
-            const matchesSearch = p.name.toLowerCase().includes(search);
+          let filteredProducts = allProducts.filter(p => {
+            const matchesSearch = search ?
+              (p.title.toLowerCase().includes(search) ||
+                p.category_name.toLowerCase().includes(search) ||
+                p.seller_name.toLowerCase().includes(search)) : true;
             const matchesCategory = category ? p.category === category : true;
             return matchesSearch && matchesCategory;
           });
@@ -137,39 +169,6 @@ const mockApi = {
       }, 800); // Simulate network delay
     });
   },
-};
-
-// --- ProductCard Component ---
-const ProductCard = ({ product }) => {
-  return (
-    <div className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1">
-      <div className="relative h-56 w-full overflow-hidden">
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        <div className="absolute top-0 right-0 m-3 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-          {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
-        </div>
-      </div>
-      <div className="p-5">
-        <h3
-          className="truncate text-lg font-bold text-gray-800"
-          title={product.name}
-        >
-          {product.name}
-        </h3>
-        <p className="text-sm text-gray-500 mb-3">Sold by {product.seller}</p>
-        <div className="flex items-center justify-between">
-          <p className="text-2xl font-black text-green-600">${product.price}</p>
-          <button className="rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-            Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 };
 
 // --- Home Page Component ---
@@ -219,6 +218,15 @@ const App = () => {
     }
   };
 
+  // Debounced search effect
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchProducts(searchTerm, selectedCategory, sortBy, groupBy);
+    }, 300); // Debounce to avoid searching on every keystroke
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, selectedCategory, sortBy, groupBy]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     fetchProducts(searchTerm, selectedCategory, sortBy, groupBy);
@@ -227,19 +235,16 @@ const App = () => {
   const handleCategoryChange = (e) => {
     const category = e.target.value;
     setSelectedCategory(category);
-    fetchProducts(searchTerm, category, sortBy, groupBy);
   };
 
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortBy(value);
-    fetchProducts(searchTerm, selectedCategory, value, groupBy);
   };
 
   const handleGroupByChange = (e) => {
     const value = e.target.value;
     setGroupBy(value);
-    fetchProducts(searchTerm, selectedCategory, sortBy, value);
   };
 
   const getCategoryName = (categoryId) => {
@@ -261,86 +266,40 @@ const App = () => {
             finds at unbeatable prices.
           </p>
           <div className="max-w-xl mx-auto">
-            <form
-              onSubmit={handleSearch}
-              className="flex flex-col sm:flex-row items-center bg-white rounded-full p-2 shadow-2xl"
-            >
-              <input
-                type="text"
-                placeholder="Search for anything..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-grow w-full sm:w-auto px-6 py-3 text-black bg-white border-none rounded-full focus:outline-none focus:ring-0 text-center sm:text-left"
-              />
-              <button
-                type="submit"
-                className="w-full sm:w-auto mt-2 sm:mt-0 rounded-full bg-green-500 text-white px-8 py-3 font-semibold transition-transform duration-200 hover:bg-green-600 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400"
-              >
-                Search
-              </button>
-            </form>
+            <ResponsiveSearchBar
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              handleSearch={handleSearch}
+            />
             {/* Sort, Filter, Group By Section */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
               {/* Sort */}
-              <div className="flex flex-col w-full sm:w-1/3">
-                <label
-                  htmlFor="sort"
-                  className="text-sm font-medium mb-1 text-white"
-                >
-                  Sort
-                </label>
-                <select
-                  id="sort"
-                  value={sortBy}
-                  onChange={handleSortChange}
-                  className="w-full px-6 py-3 bg-white text-black border-none rounded-full shadow-2xl focus:outline-none"
-                >
-                  <option value="">Default</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                  <option value="newest">Newest</option>
-                  <option value="oldest">Oldest</option>
+              <div className="relative">
+                <select id="sort" value={sortBy} onChange={handleSortChange} className="w-full px-4 py-3 bg-white/20 text-white border-none rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none">
+                  <option value="" className="text-black">Sort By</option>
+                  <option value="price_asc" className="text-black">Price: Low to High</option>
+                  <option value="price_desc" className="text-black">Price: High to Low</option>
+                  <option value="newest" className="text-black">Newest</option>
+                  <option value="oldest" className="text-black">Oldest</option>
                 </select>
               </div>
               {/* Filter (Category) */}
-              <div className="flex flex-col w-full sm:w-1/3">
-                <label
-                  htmlFor="category"
-                  className="text-sm font-medium mb-1 text-white"
-                >
-                  Filter
-                </label>
-                <select
-                  id="category"
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                  className="w-full px-6 py-3 bg-white text-black border-none rounded-full shadow-2xl focus:outline-none"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
+              <div className="relative">
+                <select id="category" value={selectedCategory} onChange={handleCategoryChange} className="w-full px-4 py-3 bg-white/20 text-white border-none rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none">
+                  <option value="" className="text-black">All Categories</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id} className="text-black">
                       {category.name}
                     </option>
                   ))}
                 </select>
               </div>
               {/* Group By */}
-              <div className="flex flex-col w-full sm:w-1/3">
-                <label
-                  htmlFor="groupBy"
-                  className="text-sm font-medium mb-1 text-white"
-                >
-                  Group By
-                </label>
-                <select
-                  id="groupBy"
-                  value={groupBy}
-                  onChange={handleGroupByChange}
-                  className="w-full px-6 py-3 bg-white text-black border-none rounded-full shadow-2xl focus:outline-none"
-                >
-                  <option value="">None</option>
-                  <option value="category">Category</option>
-                  <option value="seller">Seller</option>
+              <div className="relative">
+                <select id="groupBy" value={groupBy} onChange={handleGroupByChange} className="w-full px-4 py-3 bg-white/20 text-white border-none rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 appearance-none">
+                  <option value="" className="text-black">Group By</option>
+                  <option value="category" className="text-black">Category</option>
+                  <option value="seller" className="text-black">Seller</option>
                 </select>
               </div>
             </div>
