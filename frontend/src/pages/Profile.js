@@ -13,6 +13,8 @@ const Profile = () => {
     phone: '',
     address: ''
   });
+  const [profilePhoto, setProfilePhoto] = useState(user?.profile_photo || '');
+  const [previewPhoto, setPreviewPhoto] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
@@ -30,6 +32,7 @@ const Profile = () => {
       phone: user.phone || '',
       address: user.address || ''
     });
+    setProfilePhoto(user.profile_photo || '');
   }, [user, navigate]);
 
   const handleChange = (e) => {
@@ -39,6 +42,14 @@ const Profile = () => {
     });
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPreviewPhoto(URL.createObjectURL(file));
+      setProfilePhoto(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -46,7 +57,14 @@ const Profile = () => {
     setMessage('');
 
     try {
-      await api.patch('/api/auth/profile/', formData);
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+      if (profilePhoto && profilePhoto instanceof File) {
+        data.append('profile_photo', profilePhoto);
+      }
+      await api.patch('/api/auth/profile/', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setMessage('Profile updated successfully!');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
@@ -73,6 +91,41 @@ const Profile = () => {
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">My Profile</h1>
           <p className="text-gray-600">Manage your account information</p>
+          {/* Profile Photo */}
+          <div className="flex flex-col items-center mt-6">
+            <div className="w-28 h-28 rounded-full bg-gray-200 overflow-hidden border-4 border-green-500 shadow-lg flex items-center justify-center mb-4">
+              <img
+                src={
+                  previewPhoto ||
+                  profilePhoto && typeof profilePhoto === 'string'
+                    ? profilePhoto
+                    : user.profile_photo ||
+                      "https://ui-avatars.com/api/?name=" +
+                        encodeURIComponent(user.first_name + " " + user.last_name)
+                }
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <label className="block">
+              <span className="sr-only">Choose profile photo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-green-50 file:text-green-700
+                  hover:file:bg-green-100
+                  cursor-pointer"
+              />
+            </label>
+            {errors.profile_photo && (
+              <div className={errorMessageClasses}>{errors.profile_photo[0]}</div>
+            )}
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
