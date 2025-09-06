@@ -192,4 +192,7 @@ psd
 thumb
 sketch
 
+# kiro file
+settings.json
+
 # End of https://www.toptal.com/developers/gitignore/api/react
