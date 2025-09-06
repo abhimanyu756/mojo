@@ -63,64 +63,64 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="container">
-      <div className="add-product-container">
-        <div className="add-product-header">
-          <h1>Add a new Product</h1>
-          <p>Share your item with the EcoFinds community</p>
+    <div className="max-w-6xl mx-auto px-5">
+      <div className="max-w-2xl mx-auto py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-semibold text-gray-800 mb-2">Add a new Product</h1>
+          <p className="text-gray-600">Share your item with the EcoFinds community</p>
         </div>
 
-        <div className="add-product-form-container">
-          <form onSubmit={handleSubmit} className="add-product-form">
-            <div className="form-section">
-              <h3>Product Images</h3>
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-8">
+            <div className="mb-8 pb-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">Product Images</h3>
 
-              <div className="form-group">
-  <label>Product Images</label>
-  <div className="image-upload-placeholder">
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleImageUpload}
-      style={{ display: 'none' }}
-      id="image-upload"
-    />
-    <label htmlFor="image-upload" className="cursor-pointer block w-full">
-      {imagePreview ? (
-        <div className="relative w-full h-48 overflow-hidden rounded-lg">
-          <img
-            src={imagePreview}
-            alt="Product preview"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
-            <div className="text-2xl mb-2">📷</div>
-            <p className="text-white text-sm mb-2">Click to change image</p>
-            <div className="text-white text-xs">
-              <small>{formData.image?.name}</small>
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-semibold text-gray-800">Product Images</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 hover:border-green-500 hover:bg-green-50 transition-colors duration-300 cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload" className="cursor-pointer block w-full">
+                    {imagePreview ? (
+                      <div className="relative w-full h-48 overflow-hidden rounded-lg">
+                        <img
+                          src={imagePreview}
+                          alt="Product preview"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 text-white">
+                          <div className="text-2xl mb-2">📷</div>
+                          <p className="text-sm font-medium mb-1">Click to change image</p>
+                          <div className="text-xs opacity-80">
+                            <small>{formData.image?.name}</small>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="py-8">
+                        <div className="text-4xl mb-4">📷</div>
+                        <h4 className="text-lg font-medium text-gray-800 mb-2">Add product</h4>
+                        <p className="text-gray-600 mb-4">Image</p>
+                        <div className="text-gray-500 text-xs">
+                          <small>Tips: Use good lighting and show multiple angles</small>
+                        </div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
-          <div className="text-4xl mb-4">📷</div>
-          <h4 className="text-lg font-medium mb-1">Add product</h4>
-          <p className="text-gray-600 mb-4">Image</p>
-          <div className="text-gray-500">
-            <small>Tips: Use good lighting and show multiple angles</small>
-          </div>
-        </div>
-      )}
-    </label>
-  </div>
-</div>
-</div>
 
-            <div className="form-section">
-              <h3>Basic Information</h3>
+            <div className="mb-8 pb-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">Basic Information</h3>
 
-              <div className="form-group">
-                <label htmlFor="title">Product Title</label>
+              <div className="mb-4">
+                <label htmlFor="title" className="block mb-2 text-sm font-semibold text-gray-800">Product Title</label>
                 <input
                   type="text"
                   id="title"
@@ -128,13 +128,14 @@ const AddProduct = () => {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="Enter a descriptive title for your item"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   required
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="category">Product Category</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="category" className="block mb-2 text-sm font-semibold text-gray-800">Product Category</label>
                   <input
                     type="text"
                     id="category"
@@ -142,17 +143,19 @@ const AddProduct = () => {
                     value={formData.category}
                     onChange={handleInputChange}
                     placeholder="Enter product category"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                     required
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="condition">Condition</label>
+                <div>
+                  <label htmlFor="condition" className="block mb-2 text-sm font-semibold text-gray-800">Condition</label>
                   <select
                     id="condition"
                     name="condition"
                     value={formData.condition}
                     onChange={handleInputChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                     required
                   >
                     <option value="">Select condition</option>
@@ -165,9 +168,9 @@ const AddProduct = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="price">Price ($)</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="price" className="block mb-2 text-sm font-semibold text-gray-800">Price ($)</label>
                   <input
                     type="number"
                     id="price"
@@ -177,12 +180,13 @@ const AddProduct = () => {
                     step="0.01"
                     min="0"
                     placeholder="0.00"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                     required
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="quantity">Quantity</label>
+                <div>
+                  <label htmlFor="quantity" className="block mb-2 text-sm font-semibold text-gray-800">Quantity</label>
                   <input
                     type="number"
                     id="quantity"
@@ -191,17 +195,18 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                     min="1"
                     placeholder="1"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                     required
                   />
                 </div>
               </div>
             </div>
 
-            <div className="form-section">
-              <h3>Product Details</h3>
+            <div className="mb-8 pb-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">Product Details</h3>
 
-              <div className="form-group">
-                <label htmlFor="description">Product Description</label>
+              <div className="mb-4">
+                <label htmlFor="description" className="block mb-2 text-sm font-semibold text-gray-800">Product Description</label>
                 <textarea
                   id="description"
                   name="description"
@@ -209,13 +214,14 @@ const AddProduct = () => {
                   onChange={handleInputChange}
                   rows="4"
                   placeholder="Describe your item in detail. Include any flaws, special features, or history."
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   required
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="brand">Brand</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="brand" className="block mb-2 text-sm font-semibold text-gray-800">Brand</label>
                   <input
                     type="text"
                     id="brand"
@@ -223,11 +229,12 @@ const AddProduct = () => {
                     value={formData.brand}
                     onChange={handleInputChange}
                     placeholder="Enter brand name"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="model">Model</label>
+                <div>
+                  <label htmlFor="model" className="block mb-2 text-sm font-semibold text-gray-800">Model</label>
                   <input
                     type="text"
                     id="model"
@@ -235,12 +242,13 @@ const AddProduct = () => {
                     value={formData.model}
                     onChange={handleInputChange}
                     placeholder="Enter model number/name"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="yearOfManufacture">Year of Manufacture (if applicable)</label>
+              <div className="mb-4">
+                <label htmlFor="yearOfManufacture" className="block mb-2 text-sm font-semibold text-gray-800">Year of Manufacture (if applicable)</label>
                 <input
                   type="number"
                   id="yearOfManufacture"
@@ -250,12 +258,13 @@ const AddProduct = () => {
                   min="1900"
                   max={new Date().getFullYear()}
                   placeholder="e.g. 2020"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="material">Material</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="material" className="block mb-2 text-sm font-semibold text-gray-800">Material</label>
                   <input
                     type="text"
                     id="material"
@@ -263,11 +272,12 @@ const AddProduct = () => {
                     value={formData.material}
                     onChange={handleInputChange}
                     placeholder="e.g. Wood, Metal, Plastic"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="color">Color</label>
+                <div>
+                  <label htmlFor="color" className="block mb-2 text-sm font-semibold text-gray-800">Color</label>
                   <input
                     type="text"
                     id="color"
@@ -275,17 +285,18 @@ const AddProduct = () => {
                     value={formData.color}
                     onChange={handleInputChange}
                     placeholder="Primary color"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="form-section">
-              <h3>Dimensions & Weight</h3>
+            <div className="mb-8 pb-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">Dimensions & Weight</h3>
 
-              <div className="form-group">
-                <label>Dimensions (Length, Width, Height)</label>
-                <div className="form-row">
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-semibold text-gray-800">Dimensions (Length, Width, Height)</label>
+                <div className="grid grid-cols-3 gap-4">
                   <input
                     type="number"
                     name="length"
@@ -294,6 +305,7 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                     step="0.1"
                     min="0"
+                    className="px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                   <input
                     type="number"
@@ -303,6 +315,7 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                     step="0.1"
                     min="0"
+                    className="px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                   <input
                     type="number"
@@ -312,12 +325,13 @@ const AddProduct = () => {
                     onChange={handleInputChange}
                     step="0.1"
                     min="0"
+                    className="px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="weight">Weight (kg)</label>
+              <div>
+                <label htmlFor="weight" className="block mb-2 text-sm font-semibold text-gray-800">Weight (kg)</label>
                 <input
                   type="number"
                   id="weight"
@@ -327,45 +341,46 @@ const AddProduct = () => {
                   step="0.1"
                   min="0"
                   placeholder="Weight in kilograms"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                 />
               </div>
             </div>
 
-            <div className="form-section">
-              <h3>Additional Information</h3>
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-5">Additional Information</h3>
 
-              <div className="form-group">
-                <div className="checkbox-group" style={{ marginBottom: '12px' }}>
+              <div className="mb-4">
+                <div className="flex items-start gap-2 mb-3">
                   <input
                     type="checkbox"
                     id="originalPackaging"
                     name="originalPackaging"
                     checked={formData.originalPackaging}
                     onChange={handleInputChange}
-                    style={{ marginRight: '8px' }}
+                    className="mt-1 w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                   />
-                  <label htmlFor="originalPackaging" style={{ margin: 0, fontWeight: 'normal', cursor: 'pointer' }}>
-                    Original Packaging
+                  <label htmlFor="originalPackaging" className="text-sm font-normal text-gray-700 cursor-pointer leading-5">
+                    Original Packaging (Checkbox - implies a boolean field)
                   </label>
                 </div>
 
-                <div className="checkbox-group">
+                <div className="flex items-start gap-2">
                   <input
                     type="checkbox"
                     id="manualIncluded"
                     name="manualIncluded"
                     checked={formData.manualIncluded}
                     onChange={handleInputChange}
-                    style={{ marginRight: '8px' }}
+                    className="mt-1 w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                   />
-                  <label htmlFor="manualIncluded" style={{ margin: 0, fontWeight: 'normal', cursor: 'pointer' }}>
-                    Manual/Instructions Included
+                  <label htmlFor="manualIncluded" className="text-sm font-normal text-gray-700 cursor-pointer leading-5">
+                    Manual/Instructions Included (Checkbox - implies a boolean field)
                   </label>
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="workingConditionDescription">Working Condition Description</label>
+              <div>
+                <label htmlFor="workingConditionDescription" className="block mb-2 text-sm font-semibold text-gray-800">Working Condition Description</label>
                 <textarea
                   id="workingConditionDescription"
                   name="workingConditionDescription"
@@ -373,14 +388,15 @@ const AddProduct = () => {
                   onChange={handleInputChange}
                   rows="4"
                   placeholder="Describe the current working condition, any issues, repairs needed, etc."
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                 />
               </div>
             </div>
 
-            <div className="form-actions">
+            <div className="pt-6 border-t border-gray-200">
               <button
                 type="submit"
-                className="btn btn-primary create-listing-btn"
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-lg text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
                 Add Item
               </button>
