@@ -55,7 +55,7 @@ const Home = () => {
       {/* Hero Banner Section */}
       <div className="hero-banner">
         <div className="hero-content">
-          <h1 className='text-red-500'>Find Your Next Treasure</h1>
+          <h1>Find Your Next Treasure</h1>
           <p>Discover unique second-hand items and give them a new life</p>
           <div className="hero-search">
             <form onSubmit={handleSearch} className="hero-search-form">

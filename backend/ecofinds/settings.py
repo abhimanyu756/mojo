@@ -9,7 +9,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me-in-producti
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'http://localhost:3000']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,24 +58,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecofinds.wsgi.application'
 
 # SQLite Configuration (easier for development)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# MySQL Configuration (uncomment if you have MySQL setup)
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': config('DB_NAME', default='ecofinds'),
-#         'USER': config('DB_USER', default='root'),
-#         'PASSWORD': config('DB_PASSWORD', default=''),
-#         'HOST': config('DB_HOST', default='localhost'),
-#         'PORT': config('DB_PORT', default='3306'),
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+# MySQL Configuration (uncomment if you have MySQL setup)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME', default='ecofinds'),
+        'USER': config('DB_USER', default='root'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='3306'),
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -11,7 +11,7 @@ import MyListings from './pages/MyListings';
 import Cart from './pages/Cart';
 import Profile from './pages/Profile';
 import OrderHistory from './pages/OrderHistory';
-import './App.css';
+// import './App.css';
 
 function App() {
   return (
