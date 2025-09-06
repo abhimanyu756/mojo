@@ -16,17 +16,40 @@ class Category(models.Model):
 
 class Product(models.Model):
     CONDITION_CHOICES = [
-        ('excellent', 'Excellent'),
+        ('new', 'New'),
+        ('like-new', 'Like New'),
         ('good', 'Good'),
         ('fair', 'Fair'),
         ('poor', 'Poor'),
     ]
 
+    # Basic Information
     title = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='good')
+    
+    # Product Details
+    brand = models.CharField(max_length=100, blank=True)
+    model = models.CharField(max_length=100, blank=True)
+    year_of_manufacture = models.PositiveIntegerField(null=True, blank=True)
+    material = models.CharField(max_length=100, blank=True)
+    color = models.CharField(max_length=50, blank=True)
+    
+    # Dimensions & Weight
+    length = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, help_text="Length in cm")
+    width = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, help_text="Width in cm")
+    height = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, help_text="Height in cm")
+    weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, help_text="Weight in kg")
+    
+    # Additional Information
+    original_packaging = models.BooleanField(default=False)
+    manual_included = models.BooleanField(default=False)
+    working_condition_description = models.TextField(blank=True)
+    
+    # System fields
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

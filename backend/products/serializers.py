@@ -15,19 +15,36 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     seller_name = serializers.CharField(source='seller.username', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
+    uploaded_images = serializers.ListField(
+        child=serializers.ImageField(), write_only=True, required=False
+    )
 
     class Meta:
         model = Product
         fields = [
-            'id', 'title', 'description', 'price', 'category', 'category_name',
-            'condition', 'seller', 'seller_name', 'is_available', 'images',
-            'created_at', 'updated_at'
+            'id', 'title', 'description', 'price', 'quantity', 'category', 'category_name',
+            'condition', 'brand', 'model', 'year_of_manufacture', 'material', 'color',
+            'length', 'width', 'height', 'weight', 'original_packaging', 'manual_included',
+            'working_condition_description', 'seller', 'seller_name', 'is_available', 
+            'images', 'uploaded_images', 'created_at', 'updated_at'
         ]
         read_only_fields = ['seller', 'created_at', 'updated_at']
 
     def create(self, validated_data):
+        uploaded_images = validated_data.pop('uploaded_images', [])
         validated_data['seller'] = self.context['request'].user
-        return super().create(validated_data)
+        
+        product = super().create(validated_data)
+        
+        # Handle image uploads
+        for i, image in enumerate(uploaded_images):
+            ProductImage.objects.create(
+                product=product,
+                image=image,
+                is_primary=(i == 0)  # First image is primary
+            )
+        
+        return product
 
 class ProductListSerializer(serializers.ModelSerializer):
     seller_name = serializers.CharField(source='seller.username', read_only=True)

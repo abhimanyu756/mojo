@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -24,6 +26,10 @@ const AddProduct = () => {
   });
 
   const [imagePreview, setImagePreview] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Cleanup preview URL on component unmount
   useEffect(() => {
@@ -33,6 +39,20 @@ const AddProduct = () => {
       }
     };
   }, [imagePreview]);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/api/products/categories/');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -56,10 +76,57 @@ const AddProduct = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add your form submission logic here
+    setLoading(true);
+    setErrors({});
+
+    try {
+      // Create FormData for file upload
+      const submitData = new FormData();
+      
+      // Add all form fields to FormData
+      Object.keys(formData).forEach(key => {
+        if (key === 'image' && formData[key]) {
+          submitData.append('image', formData[key]);
+        } else if (key !== 'image' && formData[key] !== '' && formData[key] !== null) {
+          // Convert boolean values to strings for FormData
+          if (typeof formData[key] === 'boolean') {
+            submitData.append(key, formData[key].toString());
+          } else {
+            submitData.append(key, formData[key]);
+          }
+        }
+      });
+
+      // Set authentication header
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Submit to API
+      const response = await api.post('/api/products/create/', submitData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Success - redirect to product detail or products list
+      console.log('Product created successfully:', response.data);
+      navigate(`/product/${response.data.id}`);
+      
+    } catch (error) {
+      console.error('Error creating product:', error);
+      
+      if (error.response?.data) {
+        setErrors(error.response.data);
+      } else {
+        setErrors({ general: 'An error occurred while creating the product. Please try again.' });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -131,21 +198,32 @@ const AddProduct = () => {
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                   required
                 />
+                {errors.title && (
+                  <p className="mt-1 text-sm text-red-600">{errors.title[0]}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label htmlFor="category" className="block mb-2 text-sm font-semibold text-gray-800">Product Category</label>
-                  <input
-                    type="text"
+                  <select
                     id="category"
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    placeholder="Enter product category"
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-base bg-gray-50 focus:outline-none focus:border-green-500 focus:bg-white focus:shadow-sm transition-all duration-300"
                     required
-                  />
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.category && (
+                    <p className="mt-1 text-sm text-red-600">{errors.category[0]}</p>
+                  )}
                 </div>
 
                 <div>
@@ -394,11 +472,29 @@ const AddProduct = () => {
             </div>
 
             <div className="pt-6 border-t border-gray-200">
+              {errors.general && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                  {errors.general}
+                </div>
+              )}
+              
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-lg text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                disabled={loading}
+                className={`w-full font-semibold py-4 px-6 rounded-lg text-base shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
+                  loading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-xl transform hover:-translate-y-0.5'
+                }`}
               >
-                Add Item
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Creating Product...
+                  </div>
+                ) : (
+                  'Add Item'
+                )}
               </button>
             </div>
           </form>
