@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'; // Import useMemo
 import ResponsiveSearchBar from '../components/SearcBar';
 import ProductCard from '../components/ProductCard';
 import api from '../services/api'; // Make sure this points to your actual API client
+import { useAuth } from '../contexts/AuthContext'; 
 
 const App = () => {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,7 @@ const App = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortBy, setSortBy] = useState(""); // e.g., 'price_desc'
   const [groupBy, setGroupBy] = useState(""); // e.g., 'category'
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     fetchCategories();
@@ -58,6 +60,32 @@ const App = () => {
     }
   };
 
+  const handleAddToCart = async (productId) => {
+    // --- CHANGE 2: Check against `isAuthenticated` ---
+    if (!isAuthenticated) {
+      alert("Please log in to add items to your cart.");
+      return;
+    }
+
+    try {
+      // Your API call is clean because AuthContext handles the headers
+      const response = await api.post(
+        '/api/cart/add/',
+        {
+          product: productId,
+          quantity: 1
+        }
+      );
+
+      if (response.status === 201) {
+        alert('Item added to cart successfully!');
+      }
+    } catch (error) {
+      console.error('Error adding item to cart:', error.response ? error.response.data : error.message);
+      alert('Failed to add item to cart. Please try again.');
+    }
+  };
+  
   // Debounced effect for fetching data
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -166,7 +194,11 @@ const App = () => {
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {groupedProducts[groupName].map(product => (
-                      <ProductCard key={product.id} product={product} />
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onAddToCart={handleAddToCart} // <-- FIX: Add this prop
+                      />
                     ))}
                   </div>
                 </div>
@@ -174,8 +206,12 @@ const App = () => {
             ) : (
               // Render flat list of products
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {products.map(product => (
-                  <ProductCard key={product.id} product={product} />
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                  />
                 ))}
               </div>
             )}
