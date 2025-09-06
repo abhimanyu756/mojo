@@ -205,7 +205,7 @@ const App = () => {
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full">
               {/* Sort */}
               <div className="flex flex-col w-full sm:w-1/3">
-                <label htmlFor="sort" className="text-sm font-medium mb-1 text-black">Sort</label>
+                <label htmlFor="sort" className="text-sm font-medium mb-1 text-white">Sort</label>
                 <select
                   id="sort"
                   value={sortBy}
@@ -221,7 +221,7 @@ const App = () => {
               </div>
               {/* Filter (Category) */}
               <div className="flex flex-col w-full sm:w-1/3">
-                <label htmlFor="category" className="text-sm font-medium mb-1 text-black">Filter</label>
+                <label htmlFor="category" className="text-sm font-medium mb-1 text-white">Filter</label>
                 <select
                   id="category"
                   value={selectedCategory}
@@ -238,7 +238,7 @@ const App = () => {
               </div>
               {/* Group By */}
               <div className="flex flex-col w-full sm:w-1/3">
-                <label htmlFor="groupBy" className="text-sm font-medium mb-1 text-black">Group By</label>
+                <label htmlFor="groupBy" className="text-sm font-medium mb-1 text-white">Group By</label>
                 <select
                   id="groupBy"
                   value={groupBy}
